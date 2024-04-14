@@ -40,6 +40,14 @@ test.only('Fill form', async ({page}) => {
     await page.waitForTimeout(3000);
     await page.locator("button[type='submit']").click();
     await page.waitForLoadState('domcontentloaded');
+
+    //getText
+   const textContent = await page.locator('h4').textContent();
+   const innerText = await page.locator('h4').innerText();
+
+   console.log(textContent);
+   console.log(innerText);
+   
     
     await page.waitForTimeout(3000);
 })
