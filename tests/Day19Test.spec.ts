@@ -2,7 +2,7 @@ import {test} from '@playwright/test';
 
 test('Link test xpath', async ({page}) => {
 await page.goto('https://the-internet.herokuapp.com/');
-await page.waitForSelector('//a[contains(text(),"A/B Testing")]', {timeout: 10000}).click();
+await page.waitForSelector('//a[contains(text(),"A/B Testing")]', {timeout: 10000});
 
 await page.waitForTimeout(3000);
 })
