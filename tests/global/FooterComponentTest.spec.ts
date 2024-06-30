@@ -7,7 +7,7 @@ import FooterTestFlow from "../../test-flows/global/FooterTestFlows";
 test ('Test footer component Homepage', async({page})=> {
     await page.goto('https://demowebshop.tricentis.com/');
     const footerTestFlow: FooterTestFlow = new FooterTestFlow(page);
-    footerTestFlow.verifyFooterComponent();
+    await footerTestFlow.verifyFooterComponent();
 
 
     await page.waitForTimeout(1000);
