@@ -2,20 +2,18 @@ import { Locator } from "@playwright/test";
 import ComputerEssentialComponents from "./ComputerEssentialsComponents";
 import { selector } from "../SelectorDecorator";
 
-@selector(".ComputerCheapComponent.selector")
+@selector(".product-essential")
 export default class ComputerCheapComponent extends ComputerEssentialComponents{
     
     constructor(component: Locator) {
         super(component);
     }
     
-    public selectProcessorType(type: string): Promise<void> {
-        console.log("selectProcessorType | ComputerCheapComponent");
-        
-        return Promise.resolve(undefined);
+    async selectProcessorType(type: string): Promise<void> {
+        await this.selectCompOptions(type);
     }
-    public selectRamType(type: string): Promise<void> {
-        return Promise.resolve(undefined);
+    async selectRamType(type: string): Promise<void> {
+        await this.selectCompOptions(type);
     }
 
 }
