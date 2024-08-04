@@ -9,5 +9,5 @@ test('Test Standard computer component', async ({page}) =>{
   computerFlow.buildCompSpecAndAddToCart();
 
   //debug
-  await page.waitForTimeout(3 * 1000);
+  await page.waitForTimeout(5 * 1000);
 })
