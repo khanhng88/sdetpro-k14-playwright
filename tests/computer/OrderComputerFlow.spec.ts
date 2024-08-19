@@ -5,9 +5,13 @@ import ComputerEssentialComponents from "../../models/components/computer/Comput
 export default class OrderComputerFlow {
     private totalPrice: number;
     private productQuantity: number;
-    constructor(private page:Page, private computerComponentClass: ComputerComponentConstructor<ComputerEssentialComponents>){
+    constructor(
+        private readonly page:Page,
+        private readonly computerComponentClass: ComputerComponentConstructor<ComputerEssentialComponents>,
+        private readonly computerData: any){
         this.page = page;
         this.computerComponentClass = computerComponentClass;
+        this.computerData = computerData;
     }
 
     async buildCompSpecAndAddToCart(): Promise<void> {
@@ -15,18 +19,27 @@ export default class OrderComputerFlow {
         const computerDetailsPage: ComputerDetailsPage = new ComputerDetailsPage(this.page);
         const computerComp = computerDetailsPage.computerComp(this.computerComponentClass);
         await computerComp.unselectDefaultOptions();
-        const selectedProcessor = await computerComp.selectProcessorType("2.2 GHz");
-        const selectedRam = await computerComp.selectRamType("4GB");
-        const selectedHDD = await computerComp.selectHDDType("400 GB");
+        const selectedProcessor = await computerComp.selectProcessorType(this.computerData.processorType);
+        const selectedRam = await computerComp.selectRamType(this.computerData.ram);
+        const selectedHDD = await computerComp.selectHDDType(this.computerData.hdd);
+        const selectedSoftware= await computerComp.selectSoftwareType(this.computerData.software);
+
+        let additionalOsPrice = 0;
         // await computerComp.selectOSType("Windows 10");
         // await computerComp.selectSoftwareType("Office Suite");
-        console.log(`${this.extractAdditionalPrice(selectedProcessor)}} ${this.extractAdditionalPrice(selectedRam)} ${this.extractAdditionalPrice(selectedHDD)}`);
-         
+        // console.log(`${this.extractAdditionalPrice(selectedProcessor)}} ${this.extractAdditionalPrice(selectedRam)} ${this.extractAdditionalPrice(selectedHDD)}`);
+        
+        if(this.computerData.os) {
+            const selectedOs= await computerComp.selectOSType(this.computerData.os);
+            additionalOsPrice = this.extractAdditionalPrice(selectedOs);
+        }
+        //calculate current product price
         const basePrice = await computerComp.getProductPrice();
         const additionalPrices =
         this.extractAdditionalPrice(selectedProcessor) + 
         this.extractAdditionalPrice(selectedHDD) +
-        this.extractAdditionalPrice(selectedRam);
+        this.extractAdditionalPrice(selectedRam) +
+        this.extractAdditionalPrice(selectedSoftware) + additionalOsPrice;
         this.productQuantity = await computerComp.getProductQuantity();
         this.totalPrice = ( basePrice + additionalPrices ) * this.productQuantity;
 
@@ -43,6 +56,10 @@ export default class OrderComputerFlow {
         //go to shopping cart
         computerDetailsPage.headerComp().clickShoppingCartLink();
         
+    }
+
+    public async verifyShoppingCart(): Promise<void> {
+
     }
 
     private extractAdditionalPrice(fullText: string|null): number {
