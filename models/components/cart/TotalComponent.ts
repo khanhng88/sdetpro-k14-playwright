@@ -8,6 +8,8 @@ export default class TotalComponent {
     private priceTableRowSel = 'table tr';
     private priceTypeSel = '.cart-total-left span';
     private priceValueSel = '.cart-total-right .product-price';
+    private termOfServiceChecckBoxSel = '#termsofservice';
+    private checkOutBtnSel = '#checkout';
 
     protected constructor(component: Locator) {
         this.component = component;
@@ -24,5 +26,13 @@ export default class TotalComponent {
         
         }
         return priceCategories;
+    }
+
+    public async acceptTOS(): Promise<void> {
+        await this.component.locator(this.termOfServiceChecckBoxSel).click();
+    }
+
+    public async clickOnCheckOutBtn(): Promise<void> {
+        await this.component.locator(this.checkOutBtnSel).click();
     }
 }

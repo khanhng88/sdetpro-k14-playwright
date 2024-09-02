@@ -1,6 +1,14 @@
-import { Page } from "@playwright/test";
+import { Locator, Page } from "@playwright/test";
 import ComputerDetailsPage, { ComputerComponentConstructor } from "../../models/pages/ComputerDetailsPage";
 import ComputerEssentialComponents from "../../models/components/computer/ComputerEssentialsComponents";
+import ShoppingCartPage from "../../models/pages/ShoppingCartPage";
+import CheckoutPage from "../../models/pages/CheckoutPage";
+import CheckoutOptionsPage from "../../models/pages/CheckoutOptionsPage";
+import defaultCheckoutUserData from "../../test-data/DefaultCheckoutUser.json";
+import BillingAddressComponent from "../../models/components/checkout/BillingAddressComponent";
+import ShippingAddressComponent from "../../models/components/checkout/ShippingAddressComponent";
+import ShippingMethodComponent from "../../models/components/checkout/ShippingMethodComponent";
+
 
 export default class OrderComputerFlow {
     private totalPrice: number;
@@ -59,6 +67,77 @@ export default class OrderComputerFlow {
     }
 
     public async verifyShoppingCart(): Promise<void> {
+          //test shopping cart page
+  const shoppingCartPage: ShoppingCartPage =  new ShoppingCartPage(this.page);
+  const cartItemRowComponentList = await shoppingCartPage.cartItemRowComponentList();
+  const totalComponent = shoppingCartPage.totalComponent();
+
+  for (let cartItemRowComponent of cartItemRowComponentList) {
+    const unitPrice = await cartItemRowComponent.unitPrice();
+    const quantity = await cartItemRowComponent.quantity();
+    const subTotal = await cartItemRowComponent.subTotal();
+    console.log(`unit price ${unitPrice} quantity ${quantity} subtotal ${subTotal}`);
+    
+  }
+
+
+  const priceCategories =await totalComponent.priceCategories();
+  console.log(`price categories ${JSON.stringify(priceCategories)}`);
+
+    }
+
+    public async agreeTOSAndCheckOut():Promise<void> {
+        const shoppingCartPage: ShoppingCartPage =  new ShoppingCartPage(this.page);
+        await shoppingCartPage.totalComponent().acceptTOS();
+        await shoppingCartPage.totalComponent().clickOnCheckOutBtn();
+
+        const checkoutOptionsPage : CheckoutOptionsPage = new CheckoutOptionsPage(this.page);
+        await checkoutOptionsPage.checkoutAsGuest();
+    }
+
+    public async inputBillingAddress(): Promise<void> {
+        //use default data
+        const {
+            firstName, lastName, email, country, state, city, add1, zipCode, phoneNum
+        } = defaultCheckoutUserData;
+        const checkoutPage: CheckoutPage = new CheckoutPage(this.page);
+        const billingAddressComponent: BillingAddressComponent = checkoutPage.billingAddressComponent();
+        await billingAddressComponent.inputFirstName(firstName);
+        await billingAddressComponent.inputLastName(lastName);
+        await billingAddressComponent.inputEmailAddress(email);
+        await billingAddressComponent.selectCountry(country);
+        await billingAddressComponent.selectStateProvince(state);
+        await billingAddressComponent.inputCity(city);
+        await billingAddressComponent.inputAddress1(add1);
+        await billingAddressComponent.inputZipCode(zipCode);
+        await billingAddressComponent.inputPhoneNum(phoneNum);
+        await billingAddressComponent.clickOnContinueBtn();
+
+    }
+
+    public async inputShippingAddress(): Promise<void> {
+        //use default data
+        const checkoutPage: CheckoutPage = new CheckoutPage(this.page);
+        const shippingAddressComponent: ShippingAddressComponent = checkoutPage.shippingAddressComponent();
+       
+        await shippingAddressComponent.clickOnContinueBtn();
+
+    }
+
+    public async selectShippingMethod(): Promise<void> {
+        /*
+        1. Randomly select a method Math.floor(Math.random() * size of data) -> inrange index
+        */
+        //use default data
+        const shippingOptionSel = 'input[id*="shippingoption"]';
+        const shippingOptionElements: Locator[] = await this.page.locator(shippingOptionSel).all();
+        const randomIndex = Math.floor(Math.random() * shippingOptionElements.length);
+
+        const checkoutPage: CheckoutPage = new CheckoutPage(this.page);
+        const shippingMethodComponent: ShippingMethodComponent = checkoutPage.shippingMethodComponent();
+        await shippingOptionElements[randomIndex].click();
+       
+        await shippingMethodComponent.clickOnContinueBtn();
 
     }
 

@@ -12,24 +12,16 @@ test('Test Cheap computer component', async ({page}) =>{
   const computerFlow: OrderComputerFlow = new OrderComputerFlow(page, ComputerCheapComponent, testData);
   computerFlow.buildCompSpecAndAddToCart();
   await computerFlow.verifyShoppingCart();
+  // await page.waitForTimeout(3 * 1000);
+
+  await computerFlow.agreeTOSAndCheckOut();
+  await computerFlow.inputBillingAddress();
+  await computerFlow.inputShippingAddress();
+  await computerFlow.selectShippingMethod();
 
   //debug
-  await page.waitForTimeout(3 * 1000);
+  // await page.waitForTimeout(3 * 1000);
 
-  //test shopping cart page
-  const shoppingCartPage: ShoppingCartPage =  new ShoppingCartPage(page);
-  const cartItemRowComponentList = await shoppingCartPage.cartItemRowComponentList();
-  const totalComponent = shoppingCartPage.totalComponent();
 
-  for (let cartItemRowComponent of cartItemRowComponentList) {
-    const unitPrice = await cartItemRowComponent.unitPrice();
-    const quantity = await cartItemRowComponent.quantity();
-    const subTotal = await cartItemRowComponent.subTotal();
-    console.log(`unit price ${unitPrice} quantity ${quantity} subtotal ${subTotal}`);
-    
-  }
-
-  const priceCategories =await totalComponent.priceCategories();
-  console.log(`price categories ${JSON.stringify(priceCategories)}`);
   
 })
